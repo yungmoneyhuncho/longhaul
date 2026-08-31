@@ -1,11 +1,17 @@
 # longhaul
 
-**Keep local-model chat sessions alive indefinitely.** An MCP server that gives
-any local model automatic context compaction and permanent memory — the thing
-hosted assistants do for you and LM Studio, Ollama, and llama.cpp do not.
+**Your local model forgets everything when you close the app.** longhaul is an
+MCP server that gives it persistent memory across sessions, plus context
+compaction so long sessions don't hit the wall.
 
-Your 4B model with an 8K window stops hitting "context length limit reached"
-and starts holding a conversation that can run for months.
+Reopen tomorrow, next week, or next month and the model still knows what you
+decided, which files you touched, and what was left unfinished.
+
+> **Does this matter if my model has a 64K window?** Less, for compaction — and
+> that is an honest answer. But window size does not survive a restart, and 64K
+> allocated is not 64K useful: KV cache is reserved up front, prefill cost grows
+> with fill, and recall from the middle of a long context degrades. longhaul is
+> aimed at persistence first, compaction second.
 
 - **Zero dependencies.** Python 3.9+ standard library only.
 - **Works with any OpenAI-compatible endpoint** — LM Studio, Ollama,
@@ -15,9 +21,34 @@ and starts holding a conversation that can run for months.
 
 ## The problem
 
-A local model with a small context window has two bad options: stop when the
-window fills, or use a rolling window that silently throws away what you
-decided an hour ago. Neither lets you work for days on one thing.
+Two separate problems, and most tools only address the first.
+
+**Within a session:** a full window leaves two bad options — stop, or roll the
+window and silently discard what you decided an hour ago.
+
+**Between sessions:** nothing survives. Close LM Studio and the entire
+conversation is gone, however large the window was. Every new session starts
+from zero.
+
+## How it differs from the usual "AI memory" project
+
+Most are RAG over chat history: embed every message, auto-inject the top-k
+similar chunks into each turn. That fills your window with fuzzy fragments you
+did not ask for, and relevance is a similarity score.
+
+longhaul inverts that:
+
+| | typical RAG memory | longhaul |
+|---|---|---|
+| What is stored | raw message embeddings | a fixed schema written at compaction time |
+| What enters context | auto-injected top-k chunks | nothing, unless the model calls `recall` |
+| Retrieval | vector similarity | keyword overlap over plain JSONL |
+| Dependencies | embedding model, vector DB | none — stdlib only |
+| Summarizer | usually the local model | any endpoint, including a much larger one |
+
+The schema is the point. `DECISIONS` are treated as binding and never dropped;
+`ARTIFACTS` keeps exact paths and versions verbatim. A similarity score cannot
+promise either.
 
 ## How it works
 
