@@ -1,0 +1,16 @@
+[project]
+name = "longhaul"
+version = "0.1.0"
+description = "MCP server giving local LLMs automatic context compaction and permanent memory"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["mcp", "llm", "local-llm", "lmstudio", "ollama", "context", "memory", "compaction"]
+dependencies = []
+
+[project.scripts]
+longhaul = "longhaul.server:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"

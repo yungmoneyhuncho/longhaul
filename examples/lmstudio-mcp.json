@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "longhaul": {
+      "command": "python",
+      "args": ["C:\path\to\longhaul\longhaul\server.py"],
+      "env": {
+        "LONGHAUL_BASE_URL": "http://localhost:1234/v1",
+        "LONGHAUL_SESSION": "main"
+      }
+    }
+  }
+}
