@@ -1,10 +1,17 @@
 # longhaul
 
-Persistent memory for local LLMs, as an MCP server. Your model keeps what it
-learned after you close the app, and long sessions stop hitting the wall.
+Use a local model the way you'd use ChatGPT or Claude. Just keep talking. It
+handles the context so you don't have to think about it, and it remembers
+across sessions.
 
-Zero dependencies (stdlib Python), works with LM Studio, Ollama, llama.cpp, or
-any OpenAI-compatible endpoint. MIT.
+An MCP server, zero dependencies (stdlib Python), works with LM Studio, Ollama,
+llama.cpp, or any OpenAI-compatible endpoint. MIT.
+
+The thing that makes hosted assistants feel effortless isn't the model, it's
+everything around it. You never watch a token counter, never start a fresh chat
+because the old one filled up, never re-explain what you're building. Run a
+model locally and all of that becomes your job again. longhaul gives that part
+back.
 
 ## What it actually does
 
@@ -30,18 +37,23 @@ it instead of the raw history.
 
 No embeddings, no vector database, no background process.
 
-## Why not just use a bigger context window
+## "My model does 64K, I don't need this"
 
-If your model does 64K and your work fits in one sitting, compaction won't do
-much for you. That's a real answer, not a dodge.
+A bigger window buys you a longer sitting. It doesn't change the part that
+actually annoys you, which is that managing context is still your job.
 
-The window doesn't survive a restart though. Close the app and it's all gone,
-whatever size it was. That's the part longhaul is for. Compaction is the
-secondary benefit, mostly useful on 8K-32K setups or very long sessions.
+You still watch the counter. You still decide when to start over. You still
+paste the same background into a fresh chat because the old one filled up. And
+when you close the app, 64K of it goes away regardless.
 
-Worth knowing too: allocated context isn't the same as usable context. KV cache
-gets reserved up front, prefill cost climbs as the window fills, and recall from
-the middle of a long context is measurably worse than from the ends.
+If you're happy doing that, fair enough, this isn't for you. If you'd rather
+just talk to the thing, that's what it's for.
+
+One technical note while you're here: allocated context isn't usable context.
+KV cache is reserved up front, prefill cost climbs as the window fills, and
+recall from the middle of a long context is measurably worse than from the ends.
+Running near the top of a 64K window is slower and dumber than running in the
+first half of it.
 
 ## How it differs from other "AI memory" projects
 
