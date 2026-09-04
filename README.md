@@ -157,6 +157,10 @@ it means there's nothing to install or corrupt.
 - The model has to call `compact`. MCP has no hook that fires on its own, so
   this depends on the system prompt. Small models sometimes need it stated
   bluntly. Keep your client's rolling-window setting on as a backstop.
+  If you use LM Studio specifically, its plugin system does have such a hook
+  (`predictionLoopHandler`), and `alexandreaxell/context-compactor` on the LM
+  Studio Hub compacts automatically inside the chat window. longhaul's value
+  there is the permanent, searchable memory across sessions, not the trigger.
 - Compaction is lossy on purpose. Detail outside the block leaves the window.
   `recall` gets it back from disk, but the model has to think to ask.
 - Keyword search misses paraphrases that share no words with the original.
